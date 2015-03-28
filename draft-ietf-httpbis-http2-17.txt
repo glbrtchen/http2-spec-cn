@@ -22,9 +22,14 @@ Abstract
    latency by introducing header field compression and allowing multiple
    concurrent exchanges on the same connection.  It also introduces
    unsolicited push of representations from servers to clients.
-
+   本规范描述了一种对超文本传输(HTTP)协议的优化的表达方式. HTTP/2可以更高
+   效的利用网络资源, 通过引入头字段的压缩和在同一个连接中允许同时多个并发
+   的数据交换带来明显的时延减少. 它同时也引入了一种服务端向客户端主动推送
+   消息的机制.
    This specification is an alternative to, but does not obsolete, the
    HTTP/1.1 message syntax.  HTTP's existing semantics remain unchanged.
+   本规范是一个对HTTP/1.1消息语法的改进, 而不是废弃. HTTP现有的语义依然没
+   变化.
 
 Editorial Note (To be removed by RFC Editor)
 
@@ -293,6 +298,26 @@ Internet-Draft                   HTTP/2                    February 2015
    (Section 4.3).  This has especially advantageous impact upon request
    sizes in the common case, allowing many requests to be compressed
    into one packet.
+   
+   HTTP/2是对HTTP语义的一种更优化的传输方式. HTTP/2支持HTTP/1.1所有的核心
+   功能, 但是其通过多种方式实现了更高效的目标.
+   HTTP/2协议的基本单元是一个帧(Section 4.1). 每个类型的帧用于不同的目的.
+   例如, HEADERS和DATA帧用于HTTP的请求和响应消息; 其它像SETTINGS, 
+   WINDOW_UPDATE和PUSH_PROMISE这些类型的帧则用于支持HTTP/2的功能.
+   请求的多路复用通过每个HTTP请求响应携带自己的流来实现(Section 5). 流在
+   大多数情况下互不相干, 所以一个阻塞或者暂停的请求响应的会话不会阻塞应用
+   程序上的其它流.
+   数据流的多路复用通过流量控制和优先性得以保证. 流量控制(Section 5.2)用
+   于确保发送的数据能够被接收方使用. 优先性(Section 5.3)确保了最重要的数
+   据流可以优先获取有限的资源.
+   HTTP/2增加了交互模式, 在这种模式下服务器可以推送响应消息到客户端(Section 8.2). 
+   服务器推送模式允许服务器预测客户端对数据的需求, 预先发送一些数据到客户端, 
+   通过这样的方式可以平衡网络的利用率, 并有可能降低网络延迟. 服务器通过封装
+   一个PUSH_PROMISE帧来实现一个伪请求, 然后服务器就可以在一个单独的流中向之
+   前的伪请求发送响应数据.
+   由于在一个连接中的HTTP的头数据存在大量的冗余数据, 因此包含这些头的帧对其
+   进行了压缩(Section 4.3). 这在常见的场景中对请求消息的压缩有很大的帮助, 
+   可以使得很多请求都被压缩到一个数据包中.
 
 2.1.  Document Organization
 
